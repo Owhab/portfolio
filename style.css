@@ -9,7 +9,7 @@ h1{
     color: orange;
 }
 
-section{
+.flexible-container{
     display: flex;
     margin-bottom: 100px;
 }
@@ -45,4 +45,10 @@ p{
     background-image: url(images/dream-bg.png);
     background-repeat: no-repeat;
     background-position: right;
+}
+.expr{
+    margin: 50px;
+    padding: 20px;
+    border: violet 2px solid;
+    
 }
