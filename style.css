@@ -5,6 +5,11 @@ body{
 h1{
     font-size: 50px;
 }
+h2{
+    font-size: 40px;
+    
+}
+
 .name{
     color: orange;
 }
@@ -47,8 +52,33 @@ p{
     background-position: right;
 }
 .expr{
-    margin: 50px;
-    padding: 20px;
-    border: violet 2px solid;
+    
+    width: 40%;
+    border-radius: 10px;
+    margin-left: 5%;
+    margin-right: 5%;
+    padding-left: 10px;
+    box-shadow: 10px 10px 40px gray ;
     
 }
+.experience{
+    background-image: url(images/exp-bg.png);
+    background-repeat: no-repeat;
+    background-position: left;
+}
+#webexp1{
+    border-left: 7px solid;
+    border-image: linear-gradient(salmon, tomato);
+    border-image-slice: 1;
+}
+#webexp2{
+    border-left: 7px solid;
+
+    border-image: linear-gradient(blue, cyan);
+    border-image-slice: 1;
+}
+footer{
+    text-align: center;
+}
+
+
