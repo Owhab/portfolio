@@ -1,5 +1,6 @@
 body{
     font-family: 'Poppins', sans-serif;
+    margin: 0;
 }
 h1{
     font-size: 50px;
@@ -29,4 +30,13 @@ section{
     font-weight: 600;
 
 
+}
+.top{
+    background-image: url(images/top-banner.png);
+    background-repeat: no-repeat;
+}
+p{
+    font-weight: 200;
+    line-height: 30px;
+    
 }
