@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { SettingsService } from './provider/settings.service';
+import { CreateSettingsDto } from './dtos/create-settings.dto';
 
 @Controller('settings')
 export class SettingsController {
@@ -14,5 +15,10 @@ export class SettingsController {
     return {
       settings,
     };
+  }
+
+  @Post()
+  create(@Body() dto: CreateSettingsDto) {
+    return this.settingsService.create(dto);
   }
 }
