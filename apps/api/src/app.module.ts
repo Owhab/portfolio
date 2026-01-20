@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/database.config';
 import { ConfigModule } from '@nestjs/config';
 import { SkillsModule } from './skills/skills.module';
+import { ProjectsModule } from './projects/projects.module';
+import { ExperiencesModule } from './experiences/experiences.module';
 
 @Module({
   imports: [
@@ -13,6 +15,8 @@ import { SkillsModule } from './skills/skills.module';
     TypeOrmModule.forRoot(typeOrmConfig()),
     SettingsModule,
     SkillsModule,
+    ProjectsModule,
+    ExperiencesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
