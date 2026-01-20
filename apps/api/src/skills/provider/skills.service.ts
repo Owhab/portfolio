@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Skill } from '../skill.entity';
 import { Repository } from 'typeorm';
@@ -42,6 +42,17 @@ export class SkillsService {
     return {
       message: 'Skill updated successfully',
       skill: updatedSkill,
+    };
+  }
+
+  async deleteSkill(id: string) {
+    const skill = await this.skillsRepository.findOneBy({ id: +id });
+    if (!skill) {
+      throw new NotFoundException('Skill not found');
+    }
+    await this.skillsRepository.remove(skill);
+    return {
+      message: 'Skill deleted successfully',
     };
   }
 }

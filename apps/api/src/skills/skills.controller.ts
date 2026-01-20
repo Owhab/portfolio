@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { SkillsService } from './provider/skills.service';
 import { CreateSkillDto } from './dtos/create-skill.dto';
 import { UpdateSkillDto } from './dtos/update-skill.dto';
@@ -20,5 +28,10 @@ export class SkillsController {
   @Patch(':id')
   async update(@Body() dto: UpdateSkillDto, @Param('id') id: string) {
     return await this.skillsService.updateSkill(dto, id);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return await this.skillsService.deleteSkill(id);
   }
 }
