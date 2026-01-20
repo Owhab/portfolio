@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Skill } from '../skill.entity';
 import { Repository } from 'typeorm';
 import { CreateSkillDto } from '../dtos/create-skill.dto';
+import { UpdateSkillDto } from '../dtos/update-skill.dto';
 
 @Injectable()
 export class SkillsService {
@@ -24,6 +25,23 @@ export class SkillsService {
     return {
       message: 'Skill created successfully',
       skill: newSkill,
+    };
+  }
+
+  async updateSkill(dto: UpdateSkillDto, id: string) {
+    const skill = await this.skillsRepository.findOneBy({ id: +id });
+    if (!skill) {
+      return {
+        message: 'Skill not found',
+      };
+    }
+
+    const updatedSkill = Object.assign(skill, dto);
+    await this.skillsRepository.save(updatedSkill);
+
+    return {
+      message: 'Skill updated successfully',
+      skill: updatedSkill,
     };
   }
 }

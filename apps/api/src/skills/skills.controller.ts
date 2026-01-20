@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { SkillsService } from './provider/skills.service';
 import { CreateSkillDto } from './dtos/create-skill.dto';
+import { UpdateSkillDto } from './dtos/update-skill.dto';
 
 @Controller('skills')
 export class SkillsController {
@@ -14,5 +15,10 @@ export class SkillsController {
   @Post()
   async create(@Body() dto: CreateSkillDto) {
     return await this.skillsService.createSkill(dto);
+  }
+
+  @Patch(':id')
+  async update(@Body() dto: UpdateSkillDto, @Param('id') id: string) {
+    return await this.skillsService.updateSkill(dto, id);
   }
 }
