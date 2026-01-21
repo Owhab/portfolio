@@ -14,7 +14,8 @@ import {
   Bell,
   Search,
   Menu,
-  ChevronLeft
+  ChevronLeft,
+  FileText
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -43,6 +44,7 @@ export const dashboardLayoutRoute = createRoute({
 const navItems: Array<{ to: string; icon: typeof LayoutDashboard; label: string; badge?: number }> = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/projects', icon: FolderKanban, label: 'Projects' },
+  { to: '/blog', icon: FileText, label: 'Blog' },
   { to: '/skills', icon: Sparkles, label: 'Skills' },
   { to: '/experience', icon: Briefcase, label: 'Experience' },
   { to: '/education', icon: GraduationCap, label: 'Education' },

@@ -11,6 +11,9 @@ import { experienceRoute } from './routes/_dashboard/experience'
 import { educationRoute } from './routes/_dashboard/education'
 import { messagesRoute } from './routes/_dashboard/messages'
 import { settingsRoute } from './routes/_dashboard/settings'
+import { blogRoute } from './routes/_dashboard/blog'
+import { blogNewRoute } from './routes/_dashboard/blog.new'
+import { blogEditRoute } from './routes/_dashboard/blog.$postId'
 
 export const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -26,5 +29,8 @@ export const routeTree = rootRoute.addChildren([
     educationRoute,
     messagesRoute,
     settingsRoute,
+    blogRoute,
+    blogNewRoute,
+    blogEditRoute,
   ]),
 ])
