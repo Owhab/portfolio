@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { SkillCategoryService } from './provider/skill-category.service';
 import { CreateSkillCategoryDto } from './dtos/create-skill-category.dto';
 import { UpdateSkillCategoryDto } from './dtos/update-skill-category.dto';
@@ -24,7 +32,10 @@ export class SkillCategoryController {
 
   // Update Skill Category
   @Patch(':id')
-  async updateSkillCategory(@Body() dto: UpdateSkillCategoryDto, id: number) {
+  async updateSkillCategory(
+    @Body() dto: UpdateSkillCategoryDto,
+    @Param('id') id: number,
+  ) {
     return this.skillCategoryService.update(dto, id);
   }
 
