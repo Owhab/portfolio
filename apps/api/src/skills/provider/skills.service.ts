@@ -4,6 +4,7 @@ import { Skill } from '../skill.entity';
 import { Repository } from 'typeorm';
 import { CreateSkillDto } from '../dtos/create-skill.dto';
 import { UpdateSkillDto } from '../dtos/update-skill.dto';
+import { SkillCategory } from 'src/skill-category/skill-category.entity';
 
 @Injectable()
 export class SkillsService {
@@ -11,6 +12,9 @@ export class SkillsService {
     // Inject SkillsRepository
     @InjectRepository(Skill)
     public readonly skillsRepository: Repository<Skill>,
+
+    @InjectRepository(SkillCategory)
+    public readonly skillCategoryRepository: Repository<SkillCategory>,
   ) {}
 
   async findAll() {
@@ -19,7 +23,14 @@ export class SkillsService {
   }
 
   async createSkill(dto: CreateSkillDto) {
-    const newSkill = this.skillsRepository.create(dto);
+    const category = await this.skillCategoryRepository.findOneBy({
+      id: dto.categoryId,
+    });
+
+    if (!category) {
+      throw new NotFoundException('Skill category not found');
+    }
+    const newSkill = this.skillsRepository.create({ ...dto, category });
     await this.skillsRepository.save(newSkill);
 
     return {

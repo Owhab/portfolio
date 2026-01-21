@@ -30,4 +30,7 @@ export class CreateSkillDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @IsInt()
+  categoryId: number;
 }

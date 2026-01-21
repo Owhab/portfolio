@@ -11,6 +11,7 @@ import { ExperiencesModule } from './experiences/experiences.module';
 import { EducationsModule } from './educations/educations.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { SkillCategoryModule } from './skill-category/skill-category.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthModule } from './auth/auth.module';
     EducationsModule,
     UsersModule,
     AuthModule,
+    SkillCategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,5 @@
 import { SkillLevel } from 'src/common/enums/skill-level.enum';
+import { SkillCategory } from 'src/skill-category/skill-category.entity';
 import {
   Column,
   Entity,
@@ -6,6 +7,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity('skills')
@@ -35,6 +38,13 @@ export class Skill {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @ManyToOne(() => SkillCategory, (category) => category.skills, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'category_id' })
+  category: SkillCategory;
 
   @CreateDateColumn()
   createdAt: Date;
