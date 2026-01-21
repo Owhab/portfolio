@@ -155,7 +155,6 @@ function BlogEditorPage() {
     // Set cursor position after insertion
     setTimeout(() => {
       textarea.focus()
-      const newCursorPos = start + before.length + selectedText.length + after.length
       textarea.setSelectionRange(
         start + before.length,
         start + before.length + selectedText.length
@@ -163,7 +162,11 @@ function BlogEditorPage() {
     }, 0)
   }
 
-  const toolbarActions = [
+  type ToolbarItem = 
+    | { type: 'separator' }
+    | { type?: undefined; icon: typeof Bold; action: () => void; title: string }
+
+  const toolbarActions: ToolbarItem[] = [
     { icon: Bold, action: () => insertMarkdown('**', '**', 'bold text'), title: 'Bold (Ctrl+B)' },
     { icon: Italic, action: () => insertMarkdown('*', '*', 'italic text'), title: 'Italic (Ctrl+I)' },
     { icon: Strikethrough, action: () => insertMarkdown('~~', '~~', 'strikethrough'), title: 'Strikethrough' },
@@ -310,10 +313,12 @@ function BlogEditorPage() {
                 <TabsContent value="write" className="space-y-4 mt-0">
                   {/* Toolbar */}
                   <div className="flex flex-wrap items-center gap-1 p-2 bg-muted/50 rounded-lg border">
-                    {toolbarActions.map((item, index) => 
-                      item.type === 'separator' ? (
-                        <Separator key={index} orientation="vertical" className="h-6 mx-1" />
-                      ) : (
+                    {toolbarActions.map((item, index) => {
+                      if (item.type === 'separator') {
+                        return <Separator key={index} orientation="vertical" className="h-6 mx-1" />
+                      }
+                      const Icon = item.icon
+                      return (
                         <Button 
                           key={index}
                           variant="ghost" 
@@ -323,10 +328,10 @@ function BlogEditorPage() {
                           title={item.title}
                           type="button"
                         >
-                          <item.icon className="h-4 w-4" />
+                          <Icon className="h-4 w-4" />
                         </Button>
                       )
-                    )}
+                    })}
                   </div>
 
                   {/* Editor */}
