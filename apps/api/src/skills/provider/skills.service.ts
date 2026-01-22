@@ -18,19 +18,26 @@ export class SkillsService {
   ) {}
 
   async findAll() {
-    const skills = this.skillsRepository.find();
+    const skills = await this.skillsRepository.find({
+      relations: ['category'],
+    });
     return skills;
   }
 
   async createSkill(dto: CreateSkillDto) {
+    const { categoryId, ...skillData } = dto;
+
     const category = await this.skillCategoryRepository.findOneBy({
-      id: dto.categoryId,
+      id: categoryId,
     });
 
     if (!category) {
       throw new NotFoundException('Skill category not found');
     }
-    const newSkill = this.skillsRepository.create({ ...dto, category });
+    const newSkill = this.skillsRepository.create({
+      ...skillData,
+      category,
+    });
     await this.skillsRepository.save(newSkill);
 
     return {
