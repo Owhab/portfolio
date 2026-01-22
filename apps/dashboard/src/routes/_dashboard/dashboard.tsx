@@ -1,19 +1,21 @@
-import { createRoute } from '@tanstack/react-router'
+import { createRoute, Link } from '@tanstack/react-router'
 import { dashboardLayoutRoute } from '../_dashboard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Skeleton } from '@/components/ui/skeleton'
 import { 
   FolderKanban, 
   Sparkles, 
   Briefcase, 
-  MessageSquare, 
+  GraduationCap,
   TrendingUp,
-  Eye,
   ArrowUpRight,
-  Clock
 } from 'lucide-react'
+import { useProjects } from '@/hooks/use-projects'
+import { useSkills } from '@/hooks/use-skills'
+import { useExperiences } from '@/hooks/use-experiences'
+import { useEducations } from '@/hooks/use-educations'
 
 export const dashboardRoute = createRoute({
   getParentRoute: () => dashboardLayoutRoute,
@@ -21,27 +23,47 @@ export const dashboardRoute = createRoute({
   component: DashboardPage,
 })
 
-const stats = [
-  { label: 'Total Projects', value: '12', icon: FolderKanban, change: '+2 this month', trend: 'up' },
-  { label: 'Skills', value: '24', icon: Sparkles, change: '+5 this month', trend: 'up' },
-  { label: 'Experience', value: '4 years', icon: Briefcase, change: '2 companies', trend: 'neutral' },
-  { label: 'Messages', value: '8', icon: MessageSquare, change: '3 unread', trend: 'up' },
-]
-
-const recentProjects = [
-  { name: 'E-commerce Platform', status: 'completed', tech: ['React', 'Node.js'], views: 234 },
-  { name: 'Portfolio Dashboard', status: 'in-progress', tech: ['TypeScript', 'Tailwind'], views: 156 },
-  { name: 'Mobile Banking App', status: 'completed', tech: ['React Native', 'Firebase'], views: 412 },
-  { name: 'AI Chat Assistant', status: 'planning', tech: ['Python', 'OpenAI'], views: 89 },
-]
-
-const recentMessages = [
-  { name: 'Sarah Johnson', email: 'sarah@company.com', message: 'Interested in hiring for a React project...', time: '2 hours ago', avatar: 'SJ' },
-  { name: 'Mike Chen', email: 'mike@startup.io', message: 'Love your portfolio! Would like to discuss...', time: '5 hours ago', avatar: 'MC' },
-  { name: 'Emily Davis', email: 'emily@agency.com', message: 'We have an exciting opportunity...', time: '1 day ago', avatar: 'ED' },
-]
-
 function DashboardPage() {
+  const { data: projects, isLoading: projectsLoading } = useProjects()
+  const { data: skills, isLoading: skillsLoading } = useSkills()
+  const { data: experiences, isLoading: experiencesLoading } = useExperiences()
+  const { data: educations, isLoading: educationsLoading } = useEducations()
+
+  const isLoading = projectsLoading || skillsLoading || experiencesLoading || educationsLoading
+
+  const stats = [
+    { 
+      label: 'Total Projects', 
+      value: projects?.length || 0, 
+      icon: FolderKanban, 
+      loading: projectsLoading,
+      href: '/projects'
+    },
+    { 
+      label: 'Skills', 
+      value: skills?.length || 0, 
+      icon: Sparkles, 
+      loading: skillsLoading,
+      href: '/skills'
+    },
+    { 
+      label: 'Experience', 
+      value: experiences?.length || 0, 
+      icon: Briefcase, 
+      loading: experiencesLoading,
+      href: '/experience'
+    },
+    { 
+      label: 'Education', 
+      value: educations?.length || 0, 
+      icon: GraduationCap, 
+      loading: educationsLoading,
+      href: '/education'
+    },
+  ]
+
+  const recentProjects = projects?.slice(0, 4) || []
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -59,15 +81,18 @@ function DashboardPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <stat.icon className="h-5 w-5 text-primary" />
                 </div>
-                {stat.trend === 'up' && (
-                  <Badge variant="secondary" className="gap-1 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
-                    <TrendingUp className="h-3 w-3" />
-                    {stat.change}
-                  </Badge>
-                )}
+                <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                  <Link to={stat.href}>
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                </Button>
               </div>
               <div className="mt-4">
-                <p className="text-2xl font-bold">{stat.value}</p>
+                {stat.loading ? (
+                  <Skeleton className="h-8 w-16" />
+                ) : (
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                )}
                 <p className="text-sm text-muted-foreground">{stat.label}</p>
               </div>
             </CardContent>
@@ -76,81 +101,122 @@ function DashboardPage() {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid gap-6 lg:grid-cols-7">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent Projects */}
-        <Card className="lg:col-span-4">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Recent Projects</CardTitle>
               <CardDescription>Your latest portfolio projects</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" className="gap-1">
-              View all <ArrowUpRight className="h-4 w-4" />
+            <Button variant="ghost" size="sm" className="gap-1" asChild>
+              <Link to="/projects">
+                View all <ArrowUpRight className="h-4 w-4" />
+              </Link>
             </Button>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {recentProjects.map((project) => (
-                <div key={project.name} className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium">{project.name}</p>
-                      <Badge 
-                        variant={project.status === 'completed' ? 'default' : project.status === 'in-progress' ? 'secondary' : 'outline'}
-                        className="text-xs"
-                      >
-                        {project.status}
+            {projectsLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center justify-between p-4 rounded-lg border">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                    <Skeleton className="h-6 w-16" />
+                  </div>
+                ))}
+              </div>
+            ) : recentProjects.length > 0 ? (
+              <div className="space-y-4">
+                {recentProjects.map((project) => {
+                  const technologies = project.techStack?.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) || []
+                  return (
+                    <div key={project.id} className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{project.title}</p>
+                          {project.isFeatured && (
+                            <Badge variant="default" className="text-xs">Featured</Badge>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          {technologies.map((t) => (
+                            <span key={t} className="text-xs text-muted-foreground">{t}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <Badge variant={project.isActive ? 'secondary' : 'outline'}>
+                        {project.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </div>
-                    <div className="flex gap-2">
-                      {project.tech.map((t) => (
-                        <span key={t} className="text-xs text-muted-foreground">{t}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Eye className="h-4 w-4" />
-                    {project.views}
-                  </div>
-                </div>
-              ))}
-            </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <FolderKanban className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">No projects yet</p>
+                <Button className="mt-4" asChild>
+                  <Link to="/projects">Add your first project</Link>
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Recent Messages */}
-        <Card className="lg:col-span-3">
+        {/* Recent Experience */}
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Recent Messages</CardTitle>
-              <CardDescription>Latest contact form submissions</CardDescription>
+              <CardTitle>Work Experience</CardTitle>
+              <CardDescription>Your professional journey</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" className="gap-1">
-              View all <ArrowUpRight className="h-4 w-4" />
+            <Button variant="ghost" size="sm" className="gap-1" asChild>
+              <Link to="/experience">
+                View all <ArrowUpRight className="h-4 w-4" />
+              </Link>
             </Button>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {recentMessages.map((msg, idx) => (
-                <div key={idx} className="flex gap-4 p-3 rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src="" />
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm">{msg.avatar}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="font-medium text-sm truncate">{msg.name}</p>
-                      <span className="text-xs text-muted-foreground flex items-center gap-1 shrink-0">
-                        <Clock className="h-3 w-3" />
-                        {msg.time}
-                      </span>
+            {experiencesLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center justify-between p-4 rounded-lg border">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-24" />
                     </div>
-                    <p className="text-xs text-muted-foreground truncate">{msg.email}</p>
-                    <p className="text-sm text-muted-foreground truncate mt-1">{msg.message}</p>
+                    <Skeleton className="h-6 w-16" />
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : experiences && experiences.length > 0 ? (
+              <div className="space-y-4">
+                {experiences.slice(0, 4).map((exp) => (
+                  <div key={exp.id} className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{exp.title}</p>
+                        {exp.isCurrent && (
+                          <Badge className="bg-emerald-500/10 text-emerald-600 text-xs">Current</Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{exp.company}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Briefcase className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">No experience added</p>
+                <Button className="mt-4" asChild>
+                  <Link to="/experience">Add experience</Link>
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -163,10 +229,18 @@ function DashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
-            <Button>Add New Project</Button>
-            <Button variant="outline">Update Skills</Button>
-            <Button variant="outline">Add Experience</Button>
-            <Button variant="outline">View Portfolio</Button>
+            <Button asChild>
+              <Link to="/projects">Add New Project</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/skills">Update Skills</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/experience">Add Experience</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/settings">Site Settings</Link>
+            </Button>
           </div>
         </CardContent>
       </Card>

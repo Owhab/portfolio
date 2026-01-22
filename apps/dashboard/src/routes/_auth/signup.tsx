@@ -1,11 +1,13 @@
-import { createRoute, Link } from '@tanstack/react-router'
+import { createRoute, Link, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
 import { authLayoutRoute } from '../_auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Github, Mail } from 'lucide-react'
+import { Github, Mail, Loader2 } from 'lucide-react'
+import { authService } from '@/services/auth.service'
 
 export const signupRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
@@ -14,6 +16,35 @@ export const signupRoute = createRoute({
 })
 
 function SignupPage() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      await authService.register({ email, password })
+      navigate({ to: '/dashboard' })
+    } catch (err) {
+      setError('Registration failed. This email might already be in use.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGithubLogin = () => {
+    window.location.href = authService.getGithubAuthUrl()
+  }
+
+  const handleGoogleLogin = () => {
+    window.location.href = authService.getGoogleAuthUrl()
+  }
+
   return (
     <Card className="border-0 shadow-2xl shadow-primary/5">
       <CardHeader className="space-y-1 text-center pb-8">
@@ -27,11 +58,11 @@ function SignupPage() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={handleGithubLogin}>
             <Github className="mr-2 h-4 w-4" />
             GitHub
           </Button>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={handleGoogleLogin}>
             <Mail className="mr-2 h-4 w-4" />
             Google
           </Button>
@@ -44,25 +75,12 @@ function SignupPage() {
             <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
           </div>
         </div>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First name</Label>
-              <Input 
-                id="firstName" 
-                placeholder="John" 
-                className="h-11"
-              />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
+              {error}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last name</Label>
-              <Input 
-                id="lastName" 
-                placeholder="Doe" 
-                className="h-11"
-              />
-            </div>
-          </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input 
@@ -70,6 +88,10 @@ function SignupPage() {
               type="email" 
               placeholder="name@example.com" 
               className="h-11"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isLoading}
             />
           </div>
           <div className="space-y-2">
@@ -79,12 +101,25 @@ function SignupPage() {
               type="password" 
               placeholder="••••••••" 
               className="h-11"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              disabled={isLoading}
             />
+            <p className="text-xs text-muted-foreground">Must be at least 6 characters</p>
           </div>
-          <Button className="w-full h-11" asChild>
-            <Link to="/dashboard">Create Account</Link>
+          <Button className="w-full h-11" type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating account...
+              </>
+            ) : (
+              'Create Account'
+            )}
           </Button>
-        </div>
+        </form>
       </CardContent>
       <CardFooter className="flex justify-center pt-2">
         <p className="text-sm text-muted-foreground">
