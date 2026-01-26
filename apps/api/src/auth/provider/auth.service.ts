@@ -47,4 +47,25 @@ export class AuthService {
       }),
     };
   }
+
+  // Get Current User
+  async getCurrentUser(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId, isActive: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;
+  }
 }
