@@ -1,6 +1,16 @@
-import { Body, Controller, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { BlogsService } from './provider/blogs.service';
 import { CreateBlogDto } from './dtos/create-blog.dto';
+import { UpdateBlogDto } from './dtos/update-blog.dto';
 
 @Controller('blogs')
 export class BlogsController {
@@ -15,18 +25,30 @@ export class BlogsController {
     return this.blogsService.findAll();
   }
 
+  // Find One Blog by ID
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.blogsService.findOne(id);
+  }
+
   // Create Blog
+  @Post()
   async create(@Body() dto: CreateBlogDto) {
     return this.blogsService.create(dto);
   }
 
   // Update Blog
-  async update(@Body() dto: CreateBlogDto, id: number) {
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateBlogDto,
+  ) {
     return this.blogsService.update(dto, id);
   }
 
   // Delete Blog
-  async delete(id: number) {
+  @Delete(':id')
+  async delete(@Param('id', ParseIntPipe) id: number) {
     return this.blogsService.delete(id);
   }
 }
