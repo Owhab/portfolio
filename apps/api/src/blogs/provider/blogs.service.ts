@@ -21,34 +21,65 @@ export class BlogsService {
   // Find All
   async findAll() {
     const blogs = await this.blogRepository.find({
-      where: { isPublished: true },
       relations: ['tags'],
+      order: { createdAt: 'DESC' },
     });
     return {
       data: blogs,
     };
   }
 
+  // Find One by ID
+  async findOne(id: number) {
+    const blog = await this.blogRepository.findOne({
+      where: { id },
+      relations: ['tags'],
+    });
+    if (!blog) {
+      throw new Error('Blog not found');
+    }
+    return {
+      data: blog,
+    };
+  }
+
   // Create Blog
   async create(dto: CreateBlogDto) {
+    const { tagIds, ...blogData } = dto;
+
     let tags: BlogTag[] = [];
-    if (dto.tagIds && dto.tagIds.length > 0) {
-      tags = await this.blogTagRepository.findBy({ id: In(dto.tagIds) });
+    if (tagIds && tagIds.length > 0) {
+      tags = await this.blogTagRepository.findBy({ id: In(tagIds) });
     }
 
-    const blog = this.blogRepository.create({ ...dto, tags });
+    const blog = this.blogRepository.create({
+      ...blogData,
+      tags,
+      publishedAt: blogData.publishedAt
+        ? new Date(blogData.publishedAt as string | number | Date)
+        : new Date(),
+    });
     await this.blogRepository.save(blog);
     return blog;
   }
 
   // Update Blog
   async update(dto: UpdateBlogDto, id: number) {
+    const { tagIds, ...blogData } = dto;
+
     let tags: BlogTag[] = [];
-    if (dto.tagIds && dto.tagIds.length > 0) {
-      tags = await this.blogTagRepository.findBy({ id: In(dto.tagIds) });
+    if (tagIds && tagIds.length > 0) {
+      tags = await this.blogTagRepository.findBy({ id: In(tagIds) });
     }
 
-    const blog = await this.blogRepository.preload({ id, ...dto, tags });
+    const blog = await this.blogRepository.preload({
+      id,
+      ...blogData,
+      tags,
+      ...(blogData.publishedAt && {
+        publishedAt: new Date(blogData.publishedAt),
+      }),
+    });
     if (!blog) {
       throw new Error('Blog not found');
     }
