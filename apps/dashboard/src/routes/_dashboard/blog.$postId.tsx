@@ -1,4 +1,4 @@
-import { createRoute, Link } from '@tanstack/react-router'
+import { createRoute, Link, useNavigate } from '@tanstack/react-router'
 import { dashboardLayoutRoute } from '../_dashboard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Skeleton } from '@/components/ui/skeleton'
 import { 
   ArrowLeft, 
   Save, 
@@ -33,66 +33,19 @@ import {
   Sparkles,
   FileText,
   Strikethrough,
-  Minus
+  Minus,
+  Loader2,
+  Plus
 } from 'lucide-react'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useBlog, useUpdateBlog, useDeleteBlog, useBlogTags, useCreateBlogTag } from '@/hooks/use-blogs'
+import type { UpdateBlogDto } from '@/types'
 
 export const blogEditRoute = createRoute({
   getParentRoute: () => dashboardLayoutRoute,
   path: '/blog/$postId',
   component: BlogEditPage,
 })
-
-const categories = ['Development', 'Design', 'CSS', 'JavaScript', 'TypeScript', 'React', 'Next.js', 'Node.js', 'Backend', 'DevOps', 'Career', 'Tutorial']
-const popularTags = ['React', 'TypeScript', 'JavaScript', 'CSS', 'Tailwind', 'Next.js', 'Node.js', 'API', 'Tutorial', 'Best Practices', 'Performance', 'Testing']
-
-// Demo data for editing
-const existingPost = {
-  title: 'Building Scalable React Applications with TypeScript',
-  slug: 'building-scalable-react-applications-typescript',
-  content: `# Introduction
-
-Building scalable React applications requires careful planning and the right tools. TypeScript has become the go-to choice for large-scale React projects.
-
-## Why TypeScript?
-
-TypeScript provides static type checking that helps catch errors early in development. This is especially valuable in large codebases where tracking data flow can be challenging.
-
-### Key Benefits
-
-- **Type Safety**: Catch errors at compile time
-- **Better IDE Support**: Enhanced autocomplete and refactoring
-- **Self-Documenting Code**: Types serve as documentation
-- **Easier Refactoring**: Confidence when making changes
-
-## Project Structure
-
-A well-organized project structure is crucial for scalability. Here's a recommended approach:
-
-\`\`\`
-src/
-├── components/
-│   ├── ui/
-│   └── features/
-├── hooks/
-├── lib/
-├── types/
-└── utils/
-\`\`\`
-
-> Pro tip: Keep your components small and focused on a single responsibility.
-
-## Conclusion
-
-Building scalable applications is an ongoing process. Start with good foundations and iterate as your project grows.`,
-  excerpt: 'Learn how to structure your React applications for scalability using TypeScript, best practices, and modern patterns.',
-  coverImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=400&fit=crop',
-  category: 'development',
-  tags: ['React', 'TypeScript'],
-  status: 'published',
-  isFeatured: true,
-  allowComments: true,
-}
 
 // Simple markdown to HTML converter for preview
 function parseMarkdown(markdown: string): string {
@@ -139,21 +92,149 @@ function parseMarkdown(markdown: string): string {
 
 function BlogEditPage() {
   const { postId } = blogEditRoute.useParams()
-  const [title, setTitle] = useState(existingPost.title)
-  const [content, setContent] = useState(existingPost.content)
-  const [excerpt, setExcerpt] = useState(existingPost.excerpt)
-  const [category, setCategory] = useState(existingPost.category)
-  const [selectedTags, setSelectedTags] = useState<string[]>(existingPost.tags)
-  const [coverImage, setCoverImage] = useState(existingPost.coverImage)
-  const [slug, setSlug] = useState(existingPost.slug)
-  const [isFeatured, setIsFeatured] = useState(existingPost.isFeatured)
-  const [allowComments, setAllowComments] = useState(existingPost.allowComments)
+  const navigate = useNavigate()
+  const { data: blog, isLoading, error } = useBlog(parseInt(postId))
+  const updateBlog = useUpdateBlog()
+  const deleteBlog = useDeleteBlog()
+  const createBlogTag = useCreateBlogTag()
+  const { data: availableTags } = useBlogTags()
+  
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+  const [excerpt, setExcerpt] = useState('')
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
+  const [coverImage, setCoverImage] = useState('')
+  const [slug, setSlug] = useState('')
+  const [isFeatured, setIsFeatured] = useState(false)
+  const [isPublished, setIsPublished] = useState(false)
+  const [seoTitle, setSeoTitle] = useState('')
+  const [seoDescription, setSeoDescription] = useState('')
   const [activeTab, setActiveTab] = useState('write')
+  const [newTagName, setNewTagName] = useState('')
+  const [isCreatingTag, setIsCreatingTag] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag])
+  // Load blog data into form when it's fetched
+  useEffect(() => {
+    if (blog) {
+      setTitle(blog.title)
+      setContent(blog.content)
+      setExcerpt(blog.excerpt)
+      setCoverImage(blog.coverImage)
+      setSlug(blog.slug)
+      setIsFeatured(blog.isFeatured)
+      setIsPublished(blog.isPublished)
+      setSeoTitle(blog.seoTitle)
+      setSeoDescription(blog.seoDescription)
+      setSelectedTagIds(blog.tags?.map(t => t.id) || [])
+    }
+  }, [blog])
+
+  const toggleTag = (tagId: number) => {
+    setSelectedTagIds(prev => prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId])
   }
+
+  const handleCreateTag = async () => {
+    if (!newTagName.trim()) return
+    
+    // Check if tag already exists
+    const existingTag = availableTags?.find(
+      tag => tag.name.toLowerCase() === newTagName.trim().toLowerCase()
+    )
+    if (existingTag) {
+      // Just select it if it already exists
+      if (!selectedTagIds.includes(existingTag.id)) {
+        setSelectedTagIds(prev => [...prev, existingTag.id])
+      }
+      setNewTagName('')
+      return
+    }
+
+    setIsCreatingTag(true)
+    try {
+      const newTag = await createBlogTag.mutateAsync({ name: newTagName.trim() })
+      // Auto-select the newly created tag
+      if (newTag && newTag.id) {
+        setSelectedTagIds(prev => [...prev, newTag.id])
+      }
+      setNewTagName('')
+    } catch (error) {
+      console.error('Failed to create tag:', error)
+    } finally {
+      setIsCreatingTag(false)
+    }
+  }
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleCreateTag()
+    }
+  }
+
+  const calculateReadTime = () => {
+    const words = content.split(/\s+/).filter(Boolean).length
+    return Math.max(1, Math.ceil(words / 200))
+  }
+
+  const handleSaveDraft = async () => {
+    const blogData: UpdateBlogDto = {
+      title,
+      slug,
+      content,
+      excerpt: excerpt || content.substring(0, 160),
+      coverImage,
+      isPublished: false,
+      isFeatured,
+      readTime: calculateReadTime(),
+      tagIds: selectedTagIds,
+      seoTitle: seoTitle || title,
+      seoDescription: seoDescription || excerpt || content.substring(0, 160),
+    }
+
+    try {
+      await updateBlog.mutateAsync({ id: parseInt(postId), data: blogData })
+      navigate({ to: '/blog' })
+    } catch (error) {
+      console.error('Failed to save draft:', error)
+    }
+  }
+
+  const handleUpdate = async () => {
+    const blogData: UpdateBlogDto = {
+      title,
+      slug,
+      content,
+      excerpt: excerpt || content.substring(0, 160),
+      coverImage,
+      isPublished,
+      isFeatured,
+      readTime: calculateReadTime(),
+      tagIds: selectedTagIds,
+      seoTitle: seoTitle || title,
+      seoDescription: seoDescription || excerpt || content.substring(0, 160),
+    }
+
+    try {
+      await updateBlog.mutateAsync({ id: parseInt(postId), data: blogData })
+      navigate({ to: '/blog' })
+    } catch (error) {
+      console.error('Failed to update:', error)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this blog post? This action cannot be undone.')) return
+    
+    try {
+      await deleteBlog.mutateAsync(parseInt(postId))
+      navigate({ to: '/blog' })
+    } catch (error) {
+      console.error('Failed to delete:', error)
+    }
+  }
+
+  const isSubmitting = updateBlog.isPending || deleteBlog.isPending
 
   // Insert markdown syntax at cursor position
   const insertMarkdown = (before: string, after: string = '', placeholder: string = '') => {
@@ -201,6 +282,47 @@ function BlogEditPage() {
     { icon: ImageIcon, action: () => insertMarkdown('![', '](image-url)', 'alt text'), title: 'Image' },
   ]
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 w-10" />
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-6">
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-96 w-full" />
+          </div>
+          <div className="space-y-6">
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !blog) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/blog"><ArrowLeft className="h-5 w-5" /></Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Blog Post Not Found</h1>
+            <p className="text-muted-foreground">The blog post you're looking for doesn't exist.</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -215,12 +337,33 @@ function BlogEditPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-2 text-destructive hover:text-destructive">
-            <Trash2 className="h-4 w-4" />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2 text-destructive hover:text-destructive"
+            onClick={handleDelete}
+            disabled={isSubmitting}
+          >
+            {deleteBlog.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Delete
           </Button>
-          <Button variant="outline" className="gap-2"><Clock className="h-4 w-4" />Save Draft</Button>
-          <Button className="gap-2"><Globe className="h-4 w-4" />Update</Button>
+          <Button 
+            variant="outline" 
+            className="gap-2"
+            onClick={handleSaveDraft}
+            disabled={isSubmitting || !title || !slug || !content}
+          >
+            {isSubmitting && !deleteBlog.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Clock className="h-4 w-4" />}
+            Save Draft
+          </Button>
+          <Button 
+            className="gap-2"
+            onClick={handleUpdate}
+            disabled={isSubmitting || !title || !slug || !content}
+          >
+            {isSubmitting && !deleteBlog.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Globe className="h-4 w-4" />}
+            Update
+          </Button>
         </div>
       </div>
 
@@ -365,55 +508,74 @@ function BlogEditPage() {
           <Card>
             <CardHeader className="pb-3"><CardTitle className="text-base">Publish Settings</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <Select defaultValue={existingPost.status}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="published">Published</SelectItem>
-                    <SelectItem value="scheduled">Scheduled</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Publish Date</Label>
-                <Input type="datetime-local" />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Published</Label>
+                  <p className="text-xs text-muted-foreground">Make post public</p>
+                </div>
+                <Switch checked={isPublished} onCheckedChange={setIsPublished} />
               </div>
               <Separator />
               <div className="flex items-center justify-between">
-                <div><Label>Featured Post</Label><p className="text-xs text-muted-foreground">Show on homepage</p></div>
+                <div className="space-y-0.5">
+                  <Label>Featured Post</Label>
+                  <p className="text-xs text-muted-foreground">Show on homepage</p>
+                </div>
                 <Switch checked={isFeatured} onCheckedChange={setIsFeatured} />
               </div>
-              <div className="flex items-center justify-between">
-                <div><Label>Allow Comments</Label><p className="text-xs text-muted-foreground">Enable discussion</p></div>
-                <Switch checked={allowComments} onCheckedChange={setAllowComments} />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3"><CardTitle className="text-base">Category</CardTitle></CardHeader>
-            <CardContent>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                <SelectContent>{categories.map((cat) => (<SelectItem key={cat} value={cat.toLowerCase()}>{cat}</SelectItem>))}</SelectContent>
-              </Select>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Tags</CardTitle>
-              <CardDescription>Select relevant tags for your post</CardDescription>
+              <CardDescription>Select or create tags for your post</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                {popularTags.map((tag) => (
-                  <Badge key={tag} variant={selectedTags.includes(tag) ? "default" : "outline"} className="cursor-pointer transition-colors" onClick={() => toggleTag(tag)}>{tag}</Badge>
-                ))}
+                {availableTags && availableTags.length > 0 ? (
+                  availableTags.map((tag) => (
+                    <Badge 
+                      key={tag.id} 
+                      variant={selectedTagIds.includes(tag.id) ? "default" : "outline"} 
+                      className="cursor-pointer transition-colors" 
+                      onClick={() => toggleTag(tag.id)}
+                    >
+                      {tag.name}
+                    </Badge>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No tags available. Create one below.</p>
+                )}
               </div>
-              <Input placeholder="Add custom tag..." />
+              <Separator />
+              <div className="space-y-2">
+                <Label className="text-sm">Create New Tag</Label>
+                <div className="flex gap-2">
+                  <Input 
+                    placeholder="Enter tag name..."
+                    value={newTagName}
+                    onChange={(e) => setNewTagName(e.target.value)}
+                    onKeyDown={handleTagKeyDown}
+                    disabled={isCreatingTag}
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    onClick={handleCreateTag}
+                    disabled={isCreatingTag || !newTagName.trim()}
+                  >
+                    {isCreatingTag ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">Press Enter or click + to create</p>
+              </div>
             </CardContent>
           </Card>
 
@@ -422,18 +584,44 @@ function BlogEditPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Meta Title</Label>
-                <Input placeholder="SEO title (60 chars max)" maxLength={60} defaultValue={existingPost.title} />
+                <Input 
+                  placeholder="SEO title (60 chars max)" 
+                  maxLength={60} 
+                  value={seoTitle}
+                  onChange={(e) => setSeoTitle(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">{seoTitle.length}/60 characters</p>
               </div>
               <div className="space-y-2">
                 <Label>Meta Description</Label>
-                <Textarea placeholder="SEO description (160 chars max)" rows={3} maxLength={160} defaultValue={existingPost.excerpt} />
+                <Textarea 
+                  placeholder="SEO description (160 chars max)" 
+                  rows={3} 
+                  maxLength={160} 
+                  value={seoDescription}
+                  onChange={(e) => setSeoDescription(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">{seoDescription.length}/160 characters</p>
               </div>
             </CardContent>
           </Card>
 
           <div className="flex flex-col gap-2">
-            <Button className="w-full gap-2"><Save className="h-4 w-4" />Save Changes</Button>
-            <Button variant="outline" className="w-full" asChild><Link to="/blog">Cancel</Link></Button>
+            <Button 
+              className="w-full gap-2"
+              onClick={handleUpdate}
+              disabled={isSubmitting || !title || !slug || !content}
+            >
+              {isSubmitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              Save Changes
+            </Button>
+            <Button variant="outline" className="w-full" asChild disabled={isSubmitting}>
+              <Link to="/blog">Cancel</Link>
+            </Button>
           </div>
         </div>
       </div>

@@ -228,6 +228,66 @@ export interface CreateSettingsDto {
 export interface UpdateSettingsDto extends Partial<CreateSettingsDto> {}
 
 // ============================================
+// Blog Tag Types
+// ============================================
+
+export interface BlogTag {
+  id: number;
+  name: string;
+  usageCount: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBlogTagDto {
+  name: string;
+  isActive?: boolean;
+}
+
+export interface UpdateBlogTagDto extends Partial<CreateBlogTagDto> {}
+
+// ============================================
+// Blog Types
+// ============================================
+
+export interface Blog {
+  id: number;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  coverImage: string;
+  isPublished: boolean;
+  publishedAt: string;
+  isFeatured: boolean;
+  readTime: number;
+  tags: BlogTag[];
+  seoTitle: string;
+  seoDescription: string;
+  viewCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBlogDto {
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  coverImage: string;
+  isPublished?: boolean;
+  publishedAt?: string;
+  isFeatured?: boolean;
+  readTime?: number;
+  tagIds?: number[];
+  seoTitle: string;
+  seoDescription: string;
+}
+
+export interface UpdateBlogDto extends Partial<CreateBlogDto> {}
+
+// ============================================
 // API Response Types
 // ============================================
 
