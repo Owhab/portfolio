@@ -1,5 +1,5 @@
 import { apiClient, authHelpers } from '@/lib/api-client';
-import type { AuthResponse, LoginCredentials, RegisterCredentials } from '@/types';
+import type { AuthResponse, LoginCredentials, RegisterCredentials, User } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -34,6 +34,13 @@ export const authService = {
    */
   isAuthenticated(): boolean {
     return authHelpers.isAuthenticated();
+  },
+
+  /**
+   * Get current authenticated user
+   */
+  async getCurrentUser(): Promise<User> {
+    return apiClient.get<User>('/auth/me');
   },
 
   /**

@@ -2,9 +2,10 @@ import { createContext, useContext, useState, useCallback, useEffect, type React
 import { useNavigate } from '@tanstack/react-router';
 import { authService } from '@/services/auth.service';
 import { authHelpers } from '@/lib/api-client';
-import type { LoginCredentials, RegisterCredentials } from '@/types';
+import type { LoginCredentials, RegisterCredentials, User } from '@/types';
 
 interface AuthContextType {
+  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -21,26 +22,47 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
-  // Check authentication status on mount
+  // Check authentication status and fetch user on mount
   useEffect(() => {
-    const checkAuth = () => {
-      const authenticated = authHelpers.isAuthenticated();
-      setIsAuthenticated(authenticated);
+    const checkAuth = async () => {
+      const hasToken = authHelpers.isAuthenticated();
+      
+      if (hasToken) {
+        try {
+          const currentUser = await authService.getCurrentUser();
+          setUser(currentUser);
+          setIsAuthenticated(true);
+        } catch (error) {
+          // Token is invalid or expired
+          authHelpers.removeAuthToken();
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+      
       setIsLoading(false);
     };
+    
     checkAuth();
   }, []);
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     try {
       await authService.login(credentials);
+      const currentUser = await authService.getCurrentUser();
+      setUser(currentUser);
       setIsAuthenticated(true);
       navigate({ to: '/dashboard' });
     } catch (error) {
+      setUser(null);
       setIsAuthenticated(false);
       throw error;
     }
@@ -49,9 +71,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const register = useCallback(async (credentials: RegisterCredentials) => {
     try {
       await authService.register(credentials);
+      const currentUser = await authService.getCurrentUser();
+      setUser(currentUser);
       setIsAuthenticated(true);
       navigate({ to: '/dashboard' });
     } catch (error) {
+      setUser(null);
       setIsAuthenticated(false);
       throw error;
     }
@@ -59,6 +84,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = useCallback(() => {
     authService.logout();
+    setUser(null);
     setIsAuthenticated(false);
     navigate({ to: '/login' });
   }, [navigate]);
@@ -74,6 +100,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   return (
     <AuthContext.Provider
       value={{
+        user,
         isAuthenticated,
         isLoading,
         login,

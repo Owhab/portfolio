@@ -37,7 +37,7 @@ import {
 } from 'lucide-react'
 import { useState, useRef } from 'react'
 import { useCreateBlog, useBlogTags, useCreateBlogTag } from '@/hooks/use-blogs'
-import type { CreateBlogDto, BlogTag } from '@/types'
+import type { CreateBlogDto } from '@/types'
 
 export const blogNewRoute = createRoute({
   getParentRoute: () => dashboardLayoutRoute,

@@ -1,4 +1,4 @@
-import { createRoute, Outlet, Link, useLocation } from '@tanstack/react-router'
+import { createRoute, Outlet, Link, useLocation, Navigate } from '@tanstack/react-router'
 import { rootRoute } from './__root'
 import { 
   LayoutDashboard, 
@@ -15,7 +15,8 @@ import {
   Search,
   Menu,
   ChevronLeft,
-  FileText
+  FileText,
+  Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -34,6 +35,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
+import { useAuth } from '@/contexts/auth-context'
 
 export const dashboardLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -54,6 +56,7 @@ const navItems: Array<{ to: string; icon: typeof LayoutDashboard; label: string;
 
 function DashboardLayout() {
   const location = useLocation()
+  const { user, isAuthenticated, isLoading, logout } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
 
@@ -61,6 +64,28 @@ function DashboardLayout() {
     setDarkMode(!darkMode)
     document.documentElement.classList.toggle('dark')
   }
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />
+  }
+
+  // Get user initials for avatar
+  const userInitials = user?.name
+    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'U'
 
   const NavContent = ({ mobile = false }: { mobile?: boolean }) => (
     <div className="flex flex-col h-full">
@@ -136,13 +161,12 @@ function DashboardLayout() {
               )}
             >
               <Avatar className="h-8 w-8 shrink-0">
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
               {(!collapsed || mobile) && (
                 <div className="ml-2 text-left">
-                  <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-xs text-muted-foreground">john@example.com</p>
+                  <p className="text-sm font-medium">{user?.name || 'User'}</p>
+                  <p className="text-xs text-muted-foreground">{user?.email}</p>
                 </div>
               )}
             </Button>
@@ -150,15 +174,15 @@ function DashboardLayout() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/login">
-                <LogOut className="mr-2 h-4 w-4" />
-                Log out
+              <Link to="/settings">
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
               </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={logout} className="cursor-pointer">
+              <LogOut className="mr-2 h-4 w-4" />
+              Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

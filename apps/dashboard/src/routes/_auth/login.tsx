@@ -1,49 +1,49 @@
-import { createRoute, Link, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
-import { authLayoutRoute } from '../_auth'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Github, Mail, Loader2 } from 'lucide-react'
-import { authService } from '@/services/auth.service'
+import { createRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { authLayoutRoute } from "../_auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Github, Mail, Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
 
 export const loginRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
-  path: '/login',
+  path: "/login",
   component: LoginPage,
-})
+});
 
 function LoginPage() {
-  const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { login, loginWithGithub, loginWithGoogle } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     try {
-      await authService.login({ email, password })
-      navigate({ to: '/dashboard' })
-    } catch (err) {
-      setError('Invalid email or password. Please try again.')
+      await login({ email, password });
+    } catch (err: any) {
+      const message =
+        err?.data?.message || "Invalid email or password. Please try again.";
+      setError(Array.isArray(message) ? message.join(", ") : message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
-
-  const handleGithubLogin = () => {
-    window.location.href = authService.getGithubAuthUrl()
-  }
-
-  const handleGoogleLogin = () => {
-    window.location.href = authService.getGoogleAuthUrl()
-  }
+  };
 
   return (
     <Card className="border-0 shadow-2xl shadow-primary/5">
@@ -51,30 +51,14 @@ function LoginPage() {
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
           <span className="text-2xl font-bold text-primary-foreground">P</span>
         </div>
-        <CardTitle className="text-2xl font-bold tracking-tight">Welcome back</CardTitle>
+        <CardTitle className="text-2xl font-bold tracking-tight">
+          Welcome back
+        </CardTitle>
         <CardDescription className="text-muted-foreground">
           Sign in to your portfolio dashboard
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="w-full" onClick={handleGithubLogin}>
-            <Github className="mr-2 h-4 w-4" />
-            GitHub
-          </Button>
-          <Button variant="outline" className="w-full" onClick={handleGoogleLogin}>
-            <Mail className="mr-2 h-4 w-4" />
-            Google
-          </Button>
-        </div>
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <Separator className="w-full" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
-          </div>
-        </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
@@ -83,10 +67,10 @@ function LoginPage() {
           )}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input 
-              id="email" 
-              type="email" 
-              placeholder="name@example.com" 
+            <Input
+              id="email"
+              type="email"
+              placeholder="name@example.com"
               className="h-11"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -97,14 +81,17 @@ function LoginPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link to="/login" className="text-sm text-primary hover:underline">
+              <Link
+                to="/login"
+                className="text-sm text-primary hover:underline"
+              >
                 Forgot password?
               </Link>
             </div>
-            <Input 
-              id="password" 
-              type="password" 
-              placeholder="••••••••" 
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
               className="h-11"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -119,19 +106,11 @@ function LoginPage() {
                 Signing in...
               </>
             ) : (
-              'Sign In'
+              "Sign In"
             )}
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex justify-center pt-2">
-        <p className="text-sm text-muted-foreground">
-          Don't have an account?{' '}
-          <Link to="/signup" className="font-medium text-primary hover:underline">
-            Sign up
-          </Link>
-        </p>
-      </CardFooter>
     </Card>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import { createRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { authLayoutRoute } from '../_auth'
 import { Button } from '@/components/ui/button'
@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Github, Mail, Loader2 } from 'lucide-react'
-import { authService } from '@/services/auth.service'
+import { useAuth } from '@/contexts/auth-context'
 
 export const signupRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
@@ -16,7 +16,8 @@ export const signupRoute = createRoute({
 })
 
 function SignupPage() {
-  const navigate = useNavigate()
+  const { register, loginWithGithub, loginWithGoogle } = useAuth()
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -28,21 +29,13 @@ function SignupPage() {
     setError(null)
 
     try {
-      await authService.register({ email, password })
-      navigate({ to: '/dashboard' })
-    } catch (err) {
-      setError('Registration failed. This email might already be in use.')
+      await register({ name, email, password })
+    } catch (err: any) {
+      const message = err?.data?.message || 'Registration failed. This email might already be in use.'
+      setError(Array.isArray(message) ? message.join(', ') : message)
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const handleGithubLogin = () => {
-    window.location.href = authService.getGithubAuthUrl()
-  }
-
-  const handleGoogleLogin = () => {
-    window.location.href = authService.getGoogleAuthUrl()
   }
 
   return (
@@ -58,11 +51,11 @@ function SignupPage() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="w-full" onClick={handleGithubLogin}>
+          <Button variant="outline" className="w-full" onClick={loginWithGithub}>
             <Github className="mr-2 h-4 w-4" />
             GitHub
           </Button>
-          <Button variant="outline" className="w-full" onClick={handleGoogleLogin}>
+          <Button variant="outline" className="w-full" onClick={loginWithGoogle}>
             <Mail className="mr-2 h-4 w-4" />
             Google
           </Button>
@@ -81,6 +74,19 @@ function SignupPage() {
               {error}
             </div>
           )}
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input 
+              id="name" 
+              type="text" 
+              placeholder="John Doe" 
+              className="h-11"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              disabled={isLoading}
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input 

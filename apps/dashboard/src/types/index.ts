@@ -27,11 +27,10 @@ export enum Provider {
 export interface User {
   id: number;
   email: string;
-  googleId?: string;
-  githubId?: string;
-  provider: Provider;
+  name: string;
   isActive: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface LoginCredentials {
@@ -42,6 +41,7 @@ export interface LoginCredentials {
 export interface RegisterCredentials {
   email: string;
   password: string;
+  name: string;
 }
 
 export interface AuthResponse {
