@@ -10,11 +10,13 @@ import {
 import { SkillsService } from './provider/skills.service';
 import { CreateSkillDto } from './dtos/create-skill.dto';
 import { UpdateSkillDto } from './dtos/update-skill.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
+  @Public()
   @Get()
   async get() {
     return this.skillsService.findAll();

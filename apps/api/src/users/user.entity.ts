@@ -1,9 +1,9 @@
-import { Provider } from 'src/common/enums/provider.enum';
 import {
   Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('users')
@@ -17,18 +17,18 @@ export class User {
   @Column({ nullable: true })
   password?: string;
 
-  @Column({ nullable: true })
-  googleId?: string;
-
-  @Column({ nullable: true })
-  githubId?: string;
-
-  @Column({ default: Provider.LOCAL })
-  provider: Provider;
+  @Column({
+    type: 'varchar',
+    length: 50,
+  })
+  name: string;
 
   @Column({ default: true })
   isActive: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SettingsModule } from './settings/settings.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from './config/database.config';
+import { typeOrmConfig } from './database/database.config';
 import { ConfigModule } from '@nestjs/config';
 import { SkillsModule } from './skills/skills.module';
 import { ProjectsModule } from './projects/projects.module';
@@ -17,6 +17,7 @@ import { BlogTagsModule } from './blog-tags/blog-tags.module';
 
 @Module({
   imports: [
+    AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(typeOrmConfig()),
     SettingsModule,
@@ -26,7 +27,6 @@ import { BlogTagsModule } from './blog-tags/blog-tags.module';
     ExperiencesModule,
     EducationsModule,
     UsersModule,
-    AuthModule,
     BlogsModule,
     BlogTagsModule,
   ],

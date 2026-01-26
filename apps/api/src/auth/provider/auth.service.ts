@@ -1,11 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
-import { RegisterDto } from '../dtos/register.dto';
-import * as bcrypt from 'bcrypt';
-import { Provider } from 'src/common/enums/provider.enum';
+import { LoginDto } from '../dtos/login.dto';
+import { compare } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -16,44 +15,31 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // Register user
-  async register(dto: RegisterDto) {
-    // Check if user already exists
-    const existingUser = await this.userRepository.findOne({
-      where: { email: dto.email },
-    });
-    if (existingUser) {
-      throw new Error('User already exists');
-    }
-
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-
-    const user = this.userRepository.create({
-      email: dto.email,
-      password: hashedPassword,
-      provider: Provider.LOCAL,
-    });
-
-    await this.userRepository.save(user);
-    return this.generateToken(user);
-  }
-
-  async validateUser(email: string, password: string) {
+  // Login
+  async login(dto: LoginDto) {
     const user = await this.userRepository.findOne({
-      where: { email },
-      select: ['id', 'email', 'password'],
+      where: {
+        email: dto.email,
+        isActive: true,
+      },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        name: true,
+      },
     });
 
     if (!user || !user.password) {
-      return null;
+      throw new UnauthorizedException('User not found');
     }
 
-    const match = await bcrypt.compare(password, user.password);
+    const match = await compare(dto.password, user.password);
 
-    return match ? user : null;
-  }
+    if (!match) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
-  generateToken(user: User) {
     return {
       accessToken: this.jwtService.sign({
         sub: user.id,
