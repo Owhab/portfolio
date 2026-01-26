@@ -11,6 +11,7 @@ import {
 import { BlogsService } from './provider/blogs.service';
 import { CreateBlogDto } from './dtos/create-blog.dto';
 import { UpdateBlogDto } from './dtos/update-blog.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('blogs')
 export class BlogsController {
@@ -20,6 +21,7 @@ export class BlogsController {
   ) {}
 
   // Find All Blogs
+  @Public()
   @Get()
   async findAll() {
     return this.blogsService.findAll();

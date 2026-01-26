@@ -10,6 +10,7 @@ import {
 import { SkillCategoryService } from './provider/skill-category.service';
 import { CreateSkillCategoryDto } from './dtos/create-skill-category.dto';
 import { UpdateSkillCategoryDto } from './dtos/update-skill-category.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('skill-category')
 export class SkillCategoryController {
@@ -19,6 +20,7 @@ export class SkillCategoryController {
   ) {}
 
   // Get all skill categories
+  @Public()
   @Get()
   async getAllSkillCategories() {
     return this.skillCategoryService.findAll();

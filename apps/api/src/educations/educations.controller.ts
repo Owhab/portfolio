@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
 import { EducationsService } from './provider/educations.service';
 import { CreateEducationDto } from './dtos/create-education.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('educations')
 export class EducationsController {
@@ -10,6 +11,7 @@ export class EducationsController {
   ) {}
 
   // get all educations
+  @Public()
   @Get()
   async findAll() {
     return this.educationsService.findAll();

@@ -10,6 +10,7 @@ import {
 import { ExperiencesService } from './provider/experiences.service';
 import { CreateExperienceDto } from './dtos/create-experience.dto';
 import { UpdateExperienceDto } from './dtos/update-experience.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('experiences')
 export class ExperiencesController {
@@ -19,6 +20,7 @@ export class ExperiencesController {
   ) {}
 
   // get all experiences
+  @Public()
   @Get()
   async findAll() {
     return this.experiencesService.findAll();

@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
 import { ProjectsService } from './provider/projects.service';
 import { CreateProjectDto } from './dtos/create-project.dto';
 import { UpdateProjectDto } from './dtos/update-project.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('projects')
 export class ProjectsController {
@@ -11,6 +12,7 @@ export class ProjectsController {
   ) {}
 
   // get projects
+  @Public()
   @Get()
   async findAll() {
     return this.projectsService.findAll();
