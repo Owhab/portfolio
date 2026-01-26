@@ -1,5 +1,5 @@
 import { createRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { dashboardLayoutRoute } from '../_dashboard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -224,17 +224,48 @@ function ProjectDialog({ project, onClose }: { project: Project | null; onClose:
   const isEditing = !!project
 
   const [formData, setFormData] = useState<CreateProjectDto>({
-    title: project?.title || '',
-    description: project?.description || '',
-    longDescription: project?.longDescription || '',
-    thumbnail: project?.thumbnail || '',
-    techStack: project?.techStack || '',
-    liveUrl: project?.liveUrl || '',
-    githubUrl: project?.githubUrl || '',
-    sortOrder: project?.sortOrder || 0,
-    isFeatured: project?.isFeatured || false,
-    isActive: project?.isActive ?? true,
+    title: '',
+    description: '',
+    longDescription: '',
+    thumbnail: '',
+    techStack: '',
+    liveUrl: '',
+    githubUrl: '',
+    sortOrder: 0,
+    isFeatured: false,
+    isActive: true,
   })
+
+  // Update form data when project changes (for editing)
+  useEffect(() => {
+    if (project) {
+      setFormData({
+        title: project.title || '',
+        description: project.description || '',
+        longDescription: project.longDescription || '',
+        thumbnail: project.thumbnail || '',
+        techStack: project.techStack || '',
+        liveUrl: project.liveUrl || '',
+        githubUrl: project.githubUrl || '',
+        sortOrder: project.sortOrder || 0,
+        isFeatured: project.isFeatured || false,
+        isActive: project.isActive ?? true,
+      })
+    } else {
+      setFormData({
+        title: '',
+        description: '',
+        longDescription: '',
+        thumbnail: '',
+        techStack: '',
+        liveUrl: '',
+        githubUrl: '',
+        sortOrder: 0,
+        isFeatured: false,
+        isActive: true,
+      })
+    }
+  }, [project])
 
   const isSubmitting = createProject.isPending || updateProject.isPending
 

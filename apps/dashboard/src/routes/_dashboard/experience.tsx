@@ -1,5 +1,5 @@
 import { createRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { dashboardLayoutRoute } from '../_dashboard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -191,17 +191,48 @@ function ExperienceDialog({ experience, onClose }: { experience: Experience | nu
   const isEditing = !!experience
 
   const [formData, setFormData] = useState<CreateExperienceDto>({
-    title: experience?.title || '',
-    company: experience?.company || '',
-    location: experience?.location || '',
-    startDate: experience?.startDate?.split('T')[0] || '',
-    endDate: experience?.endDate?.split('T')[0] || '',
-    isCurrent: experience?.isCurrent || false,
-    description: experience?.description || '',
-    techStack: experience?.techStack || '',
-    sortOrder: experience?.sortOrder || 0,
-    isActive: experience?.isActive ?? true,
+    title: '',
+    company: '',
+    location: '',
+    startDate: '',
+    endDate: '',
+    isCurrent: false,
+    description: '',
+    techStack: '',
+    sortOrder: 0,
+    isActive: true,
   })
+
+  // Update form data when experience changes (for editing)
+  useEffect(() => {
+    if (experience) {
+      setFormData({
+        title: experience.title || '',
+        company: experience.company || '',
+        location: experience.location || '',
+        startDate: experience.startDate?.split('T')[0] || '',
+        endDate: experience.endDate?.split('T')[0] || '',
+        isCurrent: experience.isCurrent || false,
+        description: experience.description || '',
+        techStack: experience.techStack || '',
+        sortOrder: experience.sortOrder || 0,
+        isActive: experience.isActive ?? true,
+      })
+    } else {
+      setFormData({
+        title: '',
+        company: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        isCurrent: false,
+        description: '',
+        techStack: '',
+        sortOrder: 0,
+        isActive: true,
+      })
+    }
+  }, [experience])
 
   const isSubmitting = createExperience.isPending || updateExperience.isPending
 

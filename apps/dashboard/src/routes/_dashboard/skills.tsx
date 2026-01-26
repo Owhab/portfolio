@@ -1,5 +1,5 @@
 import { createRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { dashboardLayoutRoute } from '../_dashboard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -333,13 +333,36 @@ function SkillDialog({ skill, categories, onClose }: { skill: Skill | null; cate
   const isEditing = !!skill
 
   const [formData, setFormData] = useState<CreateSkillDto>({
-    name: skill?.name || '',
-    level: skill?.level || SkillLevel.INTERMEDIATE,
-    image: skill?.image || '',
-    order: skill?.order || 0,
-    isActive: skill?.isActive ?? true,
-    categoryId: skill?.category?.id || (categories[0]?.id || 0),
+    name: '',
+    level: SkillLevel.INTERMEDIATE,
+    image: '',
+    order: 0,
+    isActive: true,
+    categoryId: categories[0]?.id || 0,
   })
+
+  // Update form data when skill changes (for editing)
+  useEffect(() => {
+    if (skill) {
+      setFormData({
+        name: skill.name || '',
+        level: skill.level || SkillLevel.INTERMEDIATE,
+        image: skill.image || '',
+        order: skill.order || 0,
+        isActive: skill.isActive ?? true,
+        categoryId: skill.category?.id || (categories[0]?.id || 0),
+      })
+    } else {
+      setFormData({
+        name: '',
+        level: SkillLevel.INTERMEDIATE,
+        image: '',
+        order: 0,
+        isActive: true,
+        categoryId: categories[0]?.id || 0,
+      })
+    }
+  }, [skill, categories])
 
   const isSubmitting = createSkill.isPending || updateSkill.isPending
 
@@ -523,10 +546,27 @@ function CategoryDialog({ category, onClose }: { category: SkillCategory | null;
   const isEditing = !!category
 
   const [formData, setFormData] = useState<CreateSkillCategoryDto>({
-    name: category?.name || '',
-    sortOrder: category?.sortOrder || 0,
-    isActive: category?.isActive ?? true,
+    name: '',
+    sortOrder: 0,
+    isActive: true,
   })
+
+  // Update form data when category changes (for editing)
+  useEffect(() => {
+    if (category) {
+      setFormData({
+        name: category.name || '',
+        sortOrder: category.sortOrder || 0,
+        isActive: category.isActive ?? true,
+      })
+    } else {
+      setFormData({
+        name: '',
+        sortOrder: 0,
+        isActive: true,
+      })
+    }
+  }, [category])
 
   const isSubmitting = createCategory.isPending || updateCategory.isPending
 

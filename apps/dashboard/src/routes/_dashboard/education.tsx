@@ -1,5 +1,5 @@
 import { createRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { dashboardLayoutRoute } from '../_dashboard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -174,16 +174,45 @@ function EducationDialog({ education, onClose }: { education: Education | null; 
   const isEditing = !!education
 
   const [formData, setFormData] = useState<CreateEducationDto>({
-    degree: education?.degree || '',
-    institution: education?.institution || '',
-    location: education?.location || '',
-    startDate: education?.startDate?.split('T')[0] || '',
-    endDate: education?.endDate?.split('T')[0] || '',
-    isCurrent: education?.isCurrent || false,
-    description: education?.description || '',
-    sortOrder: education?.sortOrder || 0,
-    isActive: education?.isActive ?? true,
+    degree: '',
+    institution: '',
+    location: '',
+    startDate: '',
+    endDate: '',
+    isCurrent: false,
+    description: '',
+    sortOrder: 0,
+    isActive: true,
   })
+
+  // Update form data when education changes (for editing)
+  useEffect(() => {
+    if (education) {
+      setFormData({
+        degree: education.degree || '',
+        institution: education.institution || '',
+        location: education.location || '',
+        startDate: education.startDate?.split('T')[0] || '',
+        endDate: education.endDate?.split('T')[0] || '',
+        isCurrent: education.isCurrent || false,
+        description: education.description || '',
+        sortOrder: education.sortOrder || 0,
+        isActive: education.isActive ?? true,
+      })
+    } else {
+      setFormData({
+        degree: '',
+        institution: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        isCurrent: false,
+        description: '',
+        sortOrder: 0,
+        isActive: true,
+      })
+    }
+  }, [education])
 
   const isSubmitting = createEducation.isPending || updateEducation.isPending
 
