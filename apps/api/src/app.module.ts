@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { SkillCategoryModule } from './skill-category/skill-category.module';
 import { BlogsModule } from './blogs/blogs.module';
 import { BlogTagsModule } from './blog-tags/blog-tags.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { BlogTagsModule } from './blog-tags/blog-tags.module';
     UsersModule,
     BlogsModule,
     BlogTagsModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
