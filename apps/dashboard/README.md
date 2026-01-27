@@ -11,13 +11,13 @@ Admin dashboard for managing portfolio content.
 
 ## Setup
 
-1) Install dependencies from the repo root:
+1. Install dependencies from the repo root:
 
 ```bash
 pnpm install
 ```
 
-2) Configure env:
+2. Configure env:
 
 Copy `apps/dashboard/.env.example` to `apps/dashboard/.env` if needed.
 

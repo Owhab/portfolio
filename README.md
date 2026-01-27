@@ -16,18 +16,18 @@ A Turborepo-based monorepo for a portfolio website, admin dashboard, and backend
 
 ## Getting started
 
-1) Install dependencies:
+1. Install dependencies:
 
 ```bash
 pnpm install
 ```
 
-2) Configure environment variables:
+2. Configure environment variables:
 
 - API: copy `apps/api/.env.example` to `apps/api/.env` and update values.
 - Dashboard: copy `apps/dashboard/.env.example` to `apps/dashboard/.env` if you need to change the API base URL.
 
-3) Run everything in dev mode (recommended):
+3. Run everything in dev mode (recommended):
 
 ```bash
 pnpm dev
@@ -68,6 +68,10 @@ The dashboard is a React app using TanStack Router and React Query.
 - Stores JWT access token in `localStorage` under `accessToken`
 - Automatically adds `Authorization: Bearer <token>` for API requests
 - Redirects to `/login` when receiving 401 responses
+
+## Contributing
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for local setup, development workflow, and PR guidelines.
 
 ## Useful scripts
 
