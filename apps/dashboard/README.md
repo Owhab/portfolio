@@ -1,75 +1,59 @@
-# React + TypeScript + Vite
+# Dashboard (`apps/dashboard`)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Admin dashboard for managing portfolio content.
 
-Currently, two official plugins are available:
+## Tech stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Vite + React + TypeScript
+- TanStack Router
+- TanStack Query
+- Tailwind CSS + Radix UI components
 
-## React Compiler
+## Setup
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+1) Install dependencies from the repo root:
 
-Note: This will impact Vite dev & build performances.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2) Configure env:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Copy `apps/dashboard/.env.example` to `apps/dashboard/.env` if needed.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `VITE_API_URL` (default `http://localhost:3000`)
+
+## Run
+
+From repo root:
+
+```bash
+pnpm --filter dashboard dev
 ```
+
+Vite will print the local URL (typically `http://localhost:5173`).
+
+## Authentication model
+
+- After login, the API JWT is stored in `localStorage` as `accessToken`.
+- Requests automatically include the header `Authorization: Bearer <token>`.
+- If the API returns 401, the token is cleared and the app redirects to `/login`.
+
+The dashboard expects these API endpoints:
+
+- `POST /auth/login`
+- `GET /auth/me`
+
+Note: there is UI code for registration (`/signup`) calling `POST /auth/register`, but the API currently does **not** implement `/auth/register`.
+
+## Feature areas
+
+The dashboard uses the following API resources:
+
+- Settings: `/settings`
+- Skills: `/skill-category`, `/skills`
+- Projects: `/projects`
+- Experience: `/experiences`
+- Education: `/educations`
+- Blogs: `/blogs`
+- Blog tags: `/blog-tags`
