@@ -4,6 +4,7 @@ import { Project } from '../project.entity';
 import { Repository } from 'typeorm';
 import { CreateProjectDto } from '../dtos/create-project.dto';
 import { UpdateProjectDto } from '../dtos/update-project.dto';
+import { UploadService } from 'src/files/provider/upload.service';
 
 @Injectable()
 export class ProjectsService {
@@ -11,6 +12,9 @@ export class ProjectsService {
     // Inject Repository
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
+
+    // Inject UploadService
+    private readonly uploadService: UploadService,
   ) {}
 
   // Find all projects
@@ -22,7 +26,14 @@ export class ProjectsService {
   }
 
   // Create Project
-  async create(dto: CreateProjectDto) {
+  async create(dto: CreateProjectDto, file?: Express.Multer.File) {
+    if (file) {
+      const thumbnailPath = await this.uploadService.uploadImage(
+        file,
+        'projects',
+      );
+      dto.thumbnail = thumbnailPath;
+    }
     const project = this.projectRepository.create(dto);
     await this.projectRepository.save(project);
     return {

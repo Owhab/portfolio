@@ -23,7 +23,7 @@ export class CreateProjectDto {
   @IsString()
   @MaxLength(255)
   @IsOptional()
-  thumbnail: string;
+  thumbnail?: string;
 
   @IsString()
   @MaxLength(255)
