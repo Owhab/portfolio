@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { settingsService } from '@/services/settings.service';
-import type { CreateSettingsDto, UpdateSettingsDto } from '@/types';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { settingsService } from "@/services/settings.service";
+import type { CreateSettingsDto, UpdateSettingsDto } from "@/types";
 
-const QUERY_KEY = ['settings'];
+const QUERY_KEY = ["settings"];
 
 export function useSettings() {
   return useQuery({

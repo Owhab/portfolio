@@ -1,5 +1,9 @@
-import { apiClient } from '@/lib/api-client';
-import type { Education, CreateEducationDto, UpdateEducationDto } from '@/types';
+import { apiClient } from "@/lib/api-client";
+import type {
+  Education,
+  CreateEducationDto,
+  UpdateEducationDto,
+} from "@/types";
 
 interface EducationResponse {
   data: Education;
@@ -12,16 +16,21 @@ export const educationsService = {
    * Note: Education API returns array directly, not wrapped in { data: [] }
    */
   async getAll(): Promise<Education[]> {
-    const response = await apiClient.get<Education[] | { data: Education[] }>('/educations');
+    const response = await apiClient.get<Education[] | { data: Education[] }>(
+      "/educations",
+    );
     // Handle both array and wrapped response formats
-    return Array.isArray(response) ? response : (response.data || []);
+    return Array.isArray(response) ? response : response.data || [];
   },
 
   /**
    * Create a new education
    */
   async create(data: CreateEducationDto): Promise<Education> {
-    const response = await apiClient.post<EducationResponse>('/educations', data);
+    const response = await apiClient.post<EducationResponse>(
+      "/educations",
+      data,
+    );
     return response.data;
   },
 
@@ -29,7 +38,10 @@ export const educationsService = {
    * Update an education by ID
    */
   async update(id: number, data: UpdateEducationDto): Promise<Education> {
-    const response = await apiClient.patch<EducationResponse>(`/educations/${id}`, data);
+    const response = await apiClient.patch<EducationResponse>(
+      `/educations/${id}`,
+      data,
+    );
     return response.data;
   },
 

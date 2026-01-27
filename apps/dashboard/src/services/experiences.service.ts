@@ -1,5 +1,9 @@
-import { apiClient } from '@/lib/api-client';
-import type { Experience, CreateExperienceDto, UpdateExperienceDto } from '@/types';
+import { apiClient } from "@/lib/api-client";
+import type {
+  Experience,
+  CreateExperienceDto,
+  UpdateExperienceDto,
+} from "@/types";
 
 interface ExperiencesResponse {
   data: Experience[];
@@ -14,7 +18,7 @@ export const experiencesService = {
    * Get all experiences
    */
   async getAll(): Promise<Experience[]> {
-    const response = await apiClient.get<ExperiencesResponse>('/experiences');
+    const response = await apiClient.get<ExperiencesResponse>("/experiences");
     return response.data || [];
   },
 
@@ -22,7 +26,10 @@ export const experiencesService = {
    * Create a new experience
    */
   async create(data: CreateExperienceDto): Promise<Experience> {
-    const response = await apiClient.post<ExperienceResponse>('/experiences', data);
+    const response = await apiClient.post<ExperienceResponse>(
+      "/experiences",
+      data,
+    );
     return response.data;
   },
 
@@ -30,7 +37,10 @@ export const experiencesService = {
    * Update an experience by ID
    */
   async update(id: number, data: UpdateExperienceDto): Promise<Experience> {
-    const response = await apiClient.patch<ExperienceResponse>(`/experiences/${id}`, data);
+    const response = await apiClient.patch<ExperienceResponse>(
+      `/experiences/${id}`,
+      data,
+    );
     return response.data;
   },
 

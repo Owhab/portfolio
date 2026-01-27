@@ -1,5 +1,5 @@
-import { apiClient } from '@/lib/api-client';
-import type { Blog, CreateBlogDto, UpdateBlogDto } from '@/types';
+import { apiClient } from "@/lib/api-client";
+import type { Blog, CreateBlogDto, UpdateBlogDto } from "@/types";
 
 interface BlogsResponse {
   data: Blog[];
@@ -14,7 +14,7 @@ export const blogsService = {
    * Get all blogs
    */
   async getAll(): Promise<Blog[]> {
-    const response = await apiClient.get<BlogsResponse>('/blogs');
+    const response = await apiClient.get<BlogsResponse>("/blogs");
     return response.data || [];
   },
 
@@ -30,7 +30,7 @@ export const blogsService = {
    * Create a new blog
    */
   async create(data: CreateBlogDto): Promise<Blog> {
-    const response = await apiClient.post<Blog>('/blogs', data);
+    const response = await apiClient.post<Blog>("/blogs", data);
     return response;
   },
 

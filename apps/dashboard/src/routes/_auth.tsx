@@ -1,16 +1,16 @@
-import { createRoute, Outlet, Navigate } from '@tanstack/react-router'
-import { rootRoute } from './__root'
-import { useAuth } from '@/contexts/auth-context'
-import { Loader2 } from 'lucide-react'
+import { createRoute, Outlet, Navigate } from "@tanstack/react-router";
+import { rootRoute } from "./__root";
+import { useAuth } from "@/contexts/auth-context";
+import { Loader2 } from "lucide-react";
 
 export const authLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
-  id: '_auth',
+  id: "_auth",
   component: AuthLayout,
-})
+});
 
 function AuthLayout() {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth();
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -21,12 +21,12 @@ function AuthLayout() {
           <p className="text-sm text-muted-foreground">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Redirect to dashboard if already authenticated
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" />
+    return <Navigate to="/dashboard" />;
   }
 
   return (
@@ -36,5 +36,5 @@ function AuthLayout() {
         <Outlet />
       </div>
     </div>
-  )
+  );
 }

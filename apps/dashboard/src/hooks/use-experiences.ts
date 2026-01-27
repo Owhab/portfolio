@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { experiencesService } from '@/services/experiences.service';
-import type { CreateExperienceDto, UpdateExperienceDto } from '@/types';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { experiencesService } from "@/services/experiences.service";
+import type { CreateExperienceDto, UpdateExperienceDto } from "@/types";
 
-const QUERY_KEY = ['experiences'];
+const QUERY_KEY = ["experiences"];
 
 export function useExperiences() {
   return useQuery({

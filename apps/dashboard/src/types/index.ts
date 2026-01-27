@@ -3,21 +3,21 @@
 // ============================================
 
 export enum SkillLevel {
-  BEGINNER = 'beginner',
-  INTERMEDIATE = 'intermediate',
-  ADVANCED = 'advanced',
-  EXPERT = 'expert',
+  BEGINNER = "beginner",
+  INTERMEDIATE = "intermediate",
+  ADVANCED = "advanced",
+  EXPERT = "expert",
 }
 
 export enum Language {
-  BANGLA = 'bn',
-  ENGLISH = 'en',
+  BANGLA = "bn",
+  ENGLISH = "en",
 }
 
 export enum Provider {
-  LOCAL = 'local',
-  GOOGLE = 'google',
-  GITHUB = 'github',
+  LOCAL = "local",
+  GOOGLE = "google",
+  GITHUB = "github",
 }
 
 // ============================================

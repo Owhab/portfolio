@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { educationsService } from '@/services/educations.service';
-import type { CreateEducationDto, UpdateEducationDto } from '@/types';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { educationsService } from "@/services/educations.service";
+import type { CreateEducationDto, UpdateEducationDto } from "@/types";
 
-const QUERY_KEY = ['educations'];
+const QUERY_KEY = ["educations"];
 
 export function useEducations() {
   return useQuery({

@@ -1,14 +1,22 @@
-import { apiClient, authHelpers } from '@/lib/api-client';
-import type { AuthResponse, LoginCredentials, RegisterCredentials, User } from '@/types';
+import { apiClient, authHelpers } from "@/lib/api-client";
+import type {
+  AuthResponse,
+  LoginCredentials,
+  RegisterCredentials,
+  User,
+} from "@/types";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export const authService = {
   /**
    * Login with email and password
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
+    const response = await apiClient.post<AuthResponse>(
+      "/auth/login",
+      credentials,
+    );
     authHelpers.setAuthToken(response.accessToken);
     return response;
   },
@@ -17,7 +25,10 @@ export const authService = {
    * Register a new user
    */
   async register(credentials: RegisterCredentials): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>('/auth/register', credentials);
+    const response = await apiClient.post<AuthResponse>(
+      "/auth/register",
+      credentials,
+    );
     authHelpers.setAuthToken(response.accessToken);
     return response;
   },
@@ -40,7 +51,7 @@ export const authService = {
    * Get current authenticated user
    */
   async getCurrentUser(): Promise<User> {
-    return apiClient.get<User>('/auth/me');
+    return apiClient.get<User>("/auth/me");
   },
 
   /**

@@ -1,15 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { skillsService } from '@/services/skills.service';
-import { skillCategoriesService } from '@/services/skill-categories.service';
-import type { 
-  CreateSkillDto, 
-  UpdateSkillDto, 
-  CreateSkillCategoryDto, 
-  UpdateSkillCategoryDto 
-} from '@/types';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { skillsService } from "@/services/skills.service";
+import { skillCategoriesService } from "@/services/skill-categories.service";
+import type {
+  CreateSkillDto,
+  UpdateSkillDto,
+  CreateSkillCategoryDto,
+  UpdateSkillCategoryDto,
+} from "@/types";
 
-const SKILLS_QUERY_KEY = ['skills'];
-const CATEGORIES_QUERY_KEY = ['skill-categories'];
+const SKILLS_QUERY_KEY = ["skills"];
+const CATEGORIES_QUERY_KEY = ["skill-categories"];
 
 // Skills hooks
 export function useSkills() {
@@ -68,7 +68,8 @@ export function useCreateSkillCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateSkillCategoryDto) => skillCategoriesService.create(data),
+    mutationFn: (data: CreateSkillCategoryDto) =>
+      skillCategoriesService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY });
     },

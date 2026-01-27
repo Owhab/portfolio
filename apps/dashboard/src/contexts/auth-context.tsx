@@ -1,8 +1,15 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { authService } from '@/services/auth.service';
-import { authHelpers } from '@/lib/api-client';
-import type { LoginCredentials, RegisterCredentials, User } from '@/types';
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  type ReactNode,
+} from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { authService } from "@/services/auth.service";
+import { authHelpers } from "@/lib/api-client";
+import type { LoginCredentials, RegisterCredentials, User } from "@/types";
 
 interface AuthContextType {
   user: User | null;
@@ -31,7 +38,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const checkAuth = async () => {
       const hasToken = authHelpers.isAuthenticated();
-      
+
       if (hasToken) {
         try {
           const currentUser = await authService.getCurrentUser();
@@ -47,46 +54,52 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(null);
         setIsAuthenticated(false);
       }
-      
+
       setIsLoading(false);
     };
-    
+
     checkAuth();
   }, []);
 
-  const login = useCallback(async (credentials: LoginCredentials) => {
-    try {
-      await authService.login(credentials);
-      const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
-      setIsAuthenticated(true);
-      navigate({ to: '/dashboard' });
-    } catch (error) {
-      setUser(null);
-      setIsAuthenticated(false);
-      throw error;
-    }
-  }, [navigate]);
+  const login = useCallback(
+    async (credentials: LoginCredentials) => {
+      try {
+        await authService.login(credentials);
+        const currentUser = await authService.getCurrentUser();
+        setUser(currentUser);
+        setIsAuthenticated(true);
+        navigate({ to: "/dashboard" });
+      } catch (error) {
+        setUser(null);
+        setIsAuthenticated(false);
+        throw error;
+      }
+    },
+    [navigate],
+  );
 
-  const register = useCallback(async (credentials: RegisterCredentials) => {
-    try {
-      await authService.register(credentials);
-      const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
-      setIsAuthenticated(true);
-      navigate({ to: '/dashboard' });
-    } catch (error) {
-      setUser(null);
-      setIsAuthenticated(false);
-      throw error;
-    }
-  }, [navigate]);
+  const register = useCallback(
+    async (credentials: RegisterCredentials) => {
+      try {
+        await authService.register(credentials);
+        const currentUser = await authService.getCurrentUser();
+        setUser(currentUser);
+        setIsAuthenticated(true);
+        navigate({ to: "/dashboard" });
+      } catch (error) {
+        setUser(null);
+        setIsAuthenticated(false);
+        throw error;
+      }
+    },
+    [navigate],
+  );
 
   const logout = useCallback(() => {
     authService.logout();
     setUser(null);
     setIsAuthenticated(false);
-    navigate({ to: '/login' });
+    navigate({ to: "/login" });
   }, [navigate]);
 
   const loginWithGoogle = useCallback(() => {
@@ -118,7 +131,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

@@ -1,5 +1,5 @@
-import { apiClient } from '@/lib/api-client';
-import type { Project, CreateProjectDto, UpdateProjectDto } from '@/types';
+import { apiClient } from "@/lib/api-client";
+import type { Project, CreateProjectDto, UpdateProjectDto } from "@/types";
 
 interface ProjectsResponse {
   data: Project[];
@@ -14,7 +14,7 @@ export const projectsService = {
    * Get all projects
    */
   async getAll(): Promise<Project[]> {
-    const response = await apiClient.get<ProjectsResponse>('/projects');
+    const response = await apiClient.get<ProjectsResponse>("/projects");
     return response.data || [];
   },
 
@@ -22,7 +22,7 @@ export const projectsService = {
    * Create a new project
    */
   async create(data: CreateProjectDto): Promise<Project> {
-    const response = await apiClient.post<ProjectResponse>('/projects', data);
+    const response = await apiClient.post<ProjectResponse>("/projects", data);
     return response.data;
   },
 
@@ -30,7 +30,10 @@ export const projectsService = {
    * Update a project by ID
    */
   async update(id: number, data: UpdateProjectDto): Promise<Project> {
-    const response = await apiClient.patch<ProjectResponse>(`/projects/${id}`, data);
+    const response = await apiClient.patch<ProjectResponse>(
+      `/projects/${id}`,
+      data,
+    );
     return response.data;
   },
 

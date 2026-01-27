@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { projectsService } from '@/services/projects.service';
-import type { CreateProjectDto, UpdateProjectDto } from '@/types';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { projectsService } from "@/services/projects.service";
+import type { CreateProjectDto, UpdateProjectDto } from "@/types";
 
-const QUERY_KEY = ['projects'];
+const QUERY_KEY = ["projects"];
 
 export function useProjects() {
   return useQuery({

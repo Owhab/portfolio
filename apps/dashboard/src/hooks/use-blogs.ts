@@ -1,10 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { blogsService } from '@/services/blogs.service';
-import { blogTagsService } from '@/services/blog-tags.service';
-import type { CreateBlogDto, UpdateBlogDto, CreateBlogTagDto, UpdateBlogTagDto } from '@/types';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { blogsService } from "@/services/blogs.service";
+import { blogTagsService } from "@/services/blog-tags.service";
+import type {
+  CreateBlogDto,
+  UpdateBlogDto,
+  CreateBlogTagDto,
+  UpdateBlogTagDto,
+} from "@/types";
 
-const BLOGS_QUERY_KEY = ['blogs'];
-const BLOG_TAGS_QUERY_KEY = ['blog-tags'];
+const BLOGS_QUERY_KEY = ["blogs"];
+const BLOG_TAGS_QUERY_KEY = ["blog-tags"];
 
 // ============================================
 // Blog Hooks

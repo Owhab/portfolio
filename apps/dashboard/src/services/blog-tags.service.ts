@@ -1,5 +1,5 @@
-import { apiClient } from '@/lib/api-client';
-import type { BlogTag, CreateBlogTagDto, UpdateBlogTagDto } from '@/types';
+import { apiClient } from "@/lib/api-client";
+import type { BlogTag, CreateBlogTagDto, UpdateBlogTagDto } from "@/types";
 
 interface BlogTagsResponse {
   data: BlogTag[];
@@ -14,7 +14,7 @@ export const blogTagsService = {
    * Get all blog tags
    */
   async getAll(): Promise<BlogTag[]> {
-    const response = await apiClient.get<BlogTagsResponse>('/blog-tags');
+    const response = await apiClient.get<BlogTagsResponse>("/blog-tags");
     return response.data || [];
   },
 
@@ -22,7 +22,7 @@ export const blogTagsService = {
    * Create a new blog tag
    */
   async create(data: CreateBlogTagDto): Promise<BlogTag> {
-    const response = await apiClient.post<BlogTagResponse>('/blog-tags', data);
+    const response = await apiClient.post<BlogTagResponse>("/blog-tags", data);
     return response.data;
   },
 
@@ -30,7 +30,10 @@ export const blogTagsService = {
    * Update a blog tag by ID
    */
   async update(id: number, data: UpdateBlogTagDto): Promise<BlogTag> {
-    const response = await apiClient.patch<BlogTagResponse>(`/blog-tags/${id}`, data);
+    const response = await apiClient.patch<BlogTagResponse>(
+      `/blog-tags/${id}`,
+      data,
+    );
     return response.data;
   },
 
