@@ -2,23 +2,26 @@
 // Enums (matching API enums)
 // ============================================
 
-export enum SkillLevel {
-  BEGINNER = "beginner",
-  INTERMEDIATE = "intermediate",
-  ADVANCED = "advanced",
-  EXPERT = "expert",
-}
+export const SkillLevel = {
+  BEGINNER: "beginner",
+  INTERMEDIATE: "intermediate",
+  ADVANCED: "advanced",
+  EXPERT: "expert",
+} as const;
+export type SkillLevel = (typeof SkillLevel)[keyof typeof SkillLevel];
 
-export enum Language {
-  BANGLA = "bn",
-  ENGLISH = "en",
-}
+export const Language = {
+  BANGLA: "bn",
+  ENGLISH: "en",
+} as const;
+export type Language = (typeof Language)[keyof typeof Language];
 
-export enum Provider {
-  LOCAL = "local",
-  GOOGLE = "google",
-  GITHUB = "github",
-}
+export const Provider = {
+  LOCAL: "local",
+  GOOGLE: "google",
+  GITHUB: "github",
+} as const;
+export type Provider = (typeof Provider)[keyof typeof Provider];
 
 // ============================================
 // Auth Types

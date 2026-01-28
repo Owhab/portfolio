@@ -1,6 +1,6 @@
 import { router } from "@/router";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://api.owhab.com";
 
 type RequestMethod = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
 
@@ -10,13 +10,16 @@ interface RequestOptions {
 }
 
 class ApiError extends Error {
-  constructor(
-    public status: number,
-    public statusText: string,
-    public data?: unknown,
-  ) {
+  status: number;
+  statusText: string;
+  data?: unknown;
+
+  constructor(status: number, statusText: string, data?: unknown) {
     super(`API Error: ${status} ${statusText}`);
     this.name = "ApiError";
+    this.status = status;
+    this.statusText = statusText;
+    this.data = data;
   }
 }
 

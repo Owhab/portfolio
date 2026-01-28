@@ -15,7 +15,6 @@ import {
   Sparkles,
   Briefcase,
   GraduationCap,
-  TrendingUp,
   ArrowUpRight,
 } from "lucide-react";
 import { useProjects } from "@/hooks/use-projects";
@@ -34,9 +33,6 @@ function DashboardPage() {
   const { data: skills, isLoading: skillsLoading } = useSkills();
   const { data: experiences, isLoading: experiencesLoading } = useExperiences();
   const { data: educations, isLoading: educationsLoading } = useEducations();
-
-  const isLoading =
-    projectsLoading || skillsLoading || experiencesLoading || educationsLoading;
 
   const stats = [
     {
